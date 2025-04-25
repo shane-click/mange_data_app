@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wombat Mange Control</title>
+  <!-- Viewport meta tag for mobile responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Link to the PWA manifest file -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- (Optional) Set an Apple-specific icon or splash screen -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- Minimal styling or your existing stylesheet -->
+  <style>
+    /* Your existing CSS or any minimal styling */
+    body {
+      background-color: #d3d3d3;
+      margin: 0;
+      font-family: sans-serif;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Wombat Mange Control - Data Collection</h1>
+
+  <!-- Your existing form HTML goes here -->
+  <!-- ... -->
+  
+</div>
+
+<script>
+  // Register the service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered!'))
+        .catch((err) => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>
