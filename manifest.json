@@ -1,0 +1,20 @@
+{
+  "name": "Wombat Mange Control",
+  "short_name": "Wombat",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#d3d3d3",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
