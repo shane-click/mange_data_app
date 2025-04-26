@@ -1,53 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Wombat Mange Control</title>
-  <!-- Viewport meta tag for mobile responsiveness -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Link to the PWA manifest file -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- (Optional) Set an Apple-specific icon or splash screen -->
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-
-  <!-- Minimal styling or your existing stylesheet -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wombat Mange Control - Data Collection</title>
   <style>
-    /* Your existing CSS or any minimal styling */
-    body {
-      background-color: #d3d3d3;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: sans-serif;
+      padding: 0;
     }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #d3d3d3;
+    }
+
     .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
       max-width: 500px;
-      margin: auto;
-      background: white;
+      text-align: center;
+    }
+
+    .logo-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-container img {
+      max-width: 150px;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-size: 1rem;
+      color: #444;
+      margin-top: 1rem;
+      display: block;
+      text-align: left;
+    }
+
+    input, button {
+      font-size: 1rem;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1.2rem;
+    }
+
+    input[type="number"] {
+      width: 45%;
+      display: inline-block;
+      margin-right: 10%;
+    }
+
+    input[type="datetime-local"], input[type="text"] {
+      width: 100%;
+    }
+
+    button {
+      background: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+    }
+
+    button:disabled {
+      background: #ddd;
+    }
+
+    button:hover:enabled {
+      background: #45a049;
+    }
+
+    .timer-controls {
+      margin-top: 2rem;
+    }
+
+    .output {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      color: #444;
+      font-weight: bold;
+    }
+
+    .divider {
+      margin-top: 2rem;
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 0.5rem;
+    }
+
+    .btn-container button {
+      width: 30%;
+    }
+
+    /* Stored Data Popup or Display */
+    #storedDataModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    #storedDataContent {
+      background: #fff;
       padding: 1rem;
       border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    #closeModalBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ff6b6b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    #closeModalBtn:hover {
+      background: #ff4f4f;
+    }
+    .stored-entry {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 1rem 0;
+      padding: 0.8rem;
+      text-align: left;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Wombat Mange Control - Data Collection</h1>
+  <div class="container">
+    <!-- Logo Section with Link -->
+    <div class="logo-container">
+      <!-- Replace with your actual logo URL -->
+      <img src="YOUR_LOGO_URL_HERE" alt="Logo">
+    </div>
 
-  <!-- Your existing form HTML goes here -->
-  <!-- ... -->
-  
-</div>
+    <h1>Wombat Mange Control - Data Collection</h1>
+    <form id="dataCollectionForm">
+      <!-- Contractor Name -->
+      <label for="contractorName">Contractor Name:</label>
+      <input type="text" id="contractorName" name="contractorName" required>
 
-<script>
-  // Register the service worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registered!'))
-        .catch((err) => console.log('Service Worker registration failed:', err));
+      <!-- Location -->
+      <label for="location">Location:</label>
+      <input type="text" id="location" name="location" required>
+
+      <!-- Start/End DateTime -->
+      <label for="startDateTime">Start Date/Time:</label>
+      <input type="datetime-local" id="startDateTime" name="startDateTime" readonly required>
+
+      <label for="endDateTime">Finish Date/Time:</label>
+      <input type="datetime-local" id="endDateTime" name="endDateTime" readonly required>
+
+      <!-- Burrows Data -->
+      <label for="newBurrows">New Burrows Set:</label>
+      <input type="number" id="newBurrows" name="newBurrows" min="0" step="1" required>
+
+      <label for="checkedBurrows">Burrows Checked:</label>
+      <input type="number" id="checkedBurrows" name="checkedBurrows" min="0" step="1" required>
+
+      <label for="usedBurrows">Burrows Used:</label>
+      <input type="number" id="usedBurrows" name="usedBurrows" min="0" step="1" required>
+
+      <!-- Timer Controls -->
+      <div class="divider">
+        <div class="timer-controls">
+          <button type="button" id="startBtn">Start</button>
+          <button type="button" id="pauseBtn" disabled>Pause</button>
+          <button type="button" id="resumeBtn" disabled>Resume</button>
+          <button type="button" id="finishBtn" disabled>Finish</button>
+        </div>
+        <div class="output">
+          <strong>Elapsed Work Time:</strong> <span id="elapsedTime">00:00:00</span>
+        </div>
+        <div class="output">
+          <strong>Total Break Time:</strong> <span id="breakTime">00:00:00</span>
+        </div>
+      </div>
+
+      <!-- Submit & View Data Buttons -->
+      <button type="submit" style="background: #2196F3; color: white;">Submit</button>
+      <button type="button" id="viewDataBtn" style="background: #9C27B0; color: white; margin-top: 1rem;">View Stored Data</button>
+    </form>
+  </div>
+
+  <!-- Modal to show stored data -->
+  <div id="storedDataModal">
+    <div id="storedDataContent">
+      <button id="closeModalBtn">Close</button>
+      <h2>Stored Submissions</h2>
+      <div id="storedDataList"></div>
+    </div>
+  </div>
+
+  <script>
+    // Variables to track time
+    let workStart = null;
+    let breakStart = null;
+    let totalWorkedMs = 0;
+    let totalBreakMs = 0;
+    let timerInterval = null;
+
+    // DOM Elements
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const finishBtn = document.getElementById('finishBtn');
+    const elapsedTimeEl = document.getElementById('elapsedTime');
+    const breakTimeEl = document.getElementById('breakTime');
+    const startDateTimeEl = document.getElementById('startDateTime');
+    const endDateTimeEl = document.getElementById('endDateTime');
+
+    // localStorage key
+    const STORAGE_KEY = 'wombatData';
+
+    // Utility to format milliseconds as h:mm:ss
+    function formatTime(ms) {
+      let totalSeconds = Math.floor(ms / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      totalSeconds %= 3600;
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Update the displayed timers
+    function updateDisplay() {
+      elapsedTimeEl.textContent = formatTime(totalWorkedMs);
+      breakTimeEl.textContent = formatTime(totalBreakMs);
+    }
+
+    // Main timer function that runs every second to update totalWorkedMs
+    function runTimer() {
+      if (workStart) {
+        // Current time - start time + any previously accumulated time
+        const now = Date.now();
+        totalWorkedMs += now - workStart;
+        workStart = now; // reset workStart to 'now' for next iteration
+        updateDisplay();
+      }
+    }
+
+    // Button Listeners
+    startBtn.addEventListener('click', () => {
+      // Automatically capture the current date and time for start
+      const currentTime = new Date().toISOString().slice(0, 16);
+      startDateTimeEl.value = currentTime;
+      endDateTimeEl.value = currentTime;
+
+      // Initialize or reset everything
+      totalWorkedMs = 0;
+      totalBreakMs = 0;
+      workStart = Date.now();
+      updateDisplay();
+
+      // Enable/disable appropriate buttons
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      resumeBtn.disabled = true;
+      finishBtn.disabled = false;
+
+      // Start the interval to update the timer every second
+      timerInterval = setInterval(runTimer, 1000);
     });
-  }
-</script>
+
+    pauseBtn.addEventListener('click', () => {
+      // Pause means we start counting a break
+      breakStart = Date.now();
+      // Stop the main work timer from incrementing further
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      // Enable/disable appropriate buttons
+      pauseBtn.disabled = true;
+      resumeBtn.disabled = false;
+    });
+
+    resumeBtn.addEventListener('click', () => {
+      if (breakStart) {
+        // Calculate how long the break took
+        const now = Date.now();
+        totalBreakMs += (now - breakStart);
+        breakStart = null;
+      }
+      // Re-start the main timer
+      workStart = Date.now();
+      timerInterval = setInterval(runTimer, 1000);
+
+      // Enable/disable appropriate buttons
+      pauseBtn.disabled = false;
+      resumeBtn.disabled = true;
+    });
+
+    finishBtn.addEventListener('click', () => {
+      // If they clicked Finish, we finalize the total time
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      // If in the middle of a break, finalize that break
+      if (breakStart) {
+        const now = Date.now();
+        totalBreakMs += (now - breakStart);
+        breakStart = null;
+      }
+
+      // If still timing work, add final chunk of work time
+      if (workStart) {
+        const now = Date.now();
+        totalWorkedMs += (now - workStart);
+        workStart = null;
+      }
+
+      // Automatically capture the end date/time
+      const currentTime = new Date().toISOString().slice(0, 16);
+      endDateTimeEl.value = currentTime;
+
+      updateDisplay();
+
+      // Enable/disable appropriate buttons
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      resumeBtn.disabled = true;
+      finishBtn.disabled = true;
+    });
+
+    // Handle form submission
+    const dataCollectionForm = document.getElementById('dataCollectionForm');
+    dataCollectionForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      // Gather form data
+      const formData = new FormData(event.target);
+      const contractorName = formData.get('contractorName');
+      const location = formData.get('location');
+      const startDateTime = formData.get('startDateTime');
+      const endDateTime = formData.get('endDateTime');
+      const newBurrows = formData.get('newBurrows');
+      const checkedBurrows = formData.get('checkedBurrows');
+      const usedBurrows = formData.get('usedBurrows');
+
+      // Work time in hours/mins/secs
+      const totalWorkFormatted = formatTime(totalWorkedMs);
+      // Break time in hours/mins/secs
+      const totalBreakFormatted = formatTime(totalBreakMs);
+
+      // Create a record to store
+      const record = {
+        contractorName,
+        location,
+        startDateTime,
+        endDateTime,
+        newBurrows,
+        checkedBurrows,
+        usedBurrows,
+        totalWorkFormatted,
+        totalBreakFormatted,
+        timestamp: new Date().toString()
+      };
+
+      // Retrieve any existing data from localStorage
+      const existingData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      // Append new record
+      existingData.push(record);
+      // Store updated array
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(existingData));
+
+      // Optionally reset form
+      dataCollectionForm.reset();
+      elapsedTimeEl.textContent = "00:00:00";
+      breakTimeEl.textContent = "00:00:00";
+      totalWorkedMs = 0;
+      totalBreakMs = 0;
+      workStart = null;
+      breakStart = null;
+
+      // Re-enable Start button for next session
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      resumeBtn.disabled = true;
+      finishBtn.disabled = true;
+
+      alert("Data submitted locally!\nUse 'View Stored Data' to see all your submissions.");
+    });
+
+    // View Stored Data
+    const viewDataBtn = document.getElementById('viewDataBtn');
+    const storedDataModal = document.getElementById('storedDataModal');
+    const storedDataContent = document.getElementById('storedDataContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const storedDataList = document.getElementById('storedDataList');
+
+    // Show stored data in a modal
+    viewDataBtn.addEventListener('click', () => {
+      // Get data from localStorage
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      // Clear out old content
+      storedDataList.innerHTML = "";
+
+      if (data.length === 0) {
+        storedDataList.innerHTML = "<p>No submissions found.</p>";
+      } else {
+        data.forEach((item, index) => {
+          const entryDiv = document.createElement('div');
+          entryDiv.classList.add('stored-entry');
+          entryDiv.innerHTML = `
+            <p><strong>Submission #${index + 1}</strong></p>
+            <p><strong>Contractor:</strong> ${item.contractorName}</p>
+            <p><strong>Location:</strong> ${item.location}</p>
+            <p><strong>Start:</strong> ${item.startDateTime}</p>
+            <p><strong>Finish:</strong> ${item.endDateTime}</p>
+            <p><strong>New Burrows Set:</strong> ${item.newBurrows}</p>
+            <p><strong>Burrows Checked:</strong> ${item.checkedBurrows}</p>
+            <p><strong>Burrows Used:</strong> ${item.usedBurrows}</p>
+            <p><strong>Total Work Time:</strong> ${item.totalWorkFormatted}</p>
+            <p><strong>Total Break Time:</strong> ${item.totalBreakFormatted}</p>
+            <p><em>Saved on: ${item.timestamp}</em></p>
+          `;
+          storedDataList.appendChild(entryDiv);
+        });
+      }
+
+      // Display the modal
+      storedDataModal.style.display = "flex";
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      storedDataModal.style.display = "none";
+    });
+
+    // Close modal if clicking outside content
+    storedDataModal.addEventListener('click', (e) => {
+      if (e.target === storedDataModal) {
+        storedDataModal.style.display = "none";
+      }
+    });
+  </script>
+
 </body>
 </html>
