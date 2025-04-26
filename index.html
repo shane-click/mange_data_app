@@ -6,36 +6,39 @@
 
   <title>Wombat Mange Control</title>
 
-  <!-- PWA manifest & iOS icon -->
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
+  <!-- basic styling -->
   <style>
-    /* ————— minimal styles ————— */
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:sans-serif;background:#d3d3d3;
-         display:flex;justify-content:center;align-items:center;min-height:100vh}
-    .container{background:#fff;padding:2rem;border-radius:12px;
-               box-shadow:0 4px 10px rgba(0,0,0,.1);width:100%;max-width:500px;text-align:center}
+    body{font-family:sans-serif;background:#d3d3d3;display:flex;justify-content:center;
+         align-items:center;min-height:100vh}
+    .container{background:#fff;padding:2rem;border-radius:12px;width:100%;max-width:500px;
+               box-shadow:0 4px 10px rgba(0,0,0,.1);text-align:center}
     .logo-container img{max-width:150px;margin-bottom:1.5rem}
     h1{font-size:1.5rem;margin-bottom:1.5rem}
-    label{display:block;margin-top:1rem;font-size:1rem;text-align:left;color:#444}
-    input,button{width:100%;font-size:1rem;padding:.8rem;margin-top:.5rem;margin-bottom:1.2rem;
-                 border:1px solid #ddd;border-radius:8px}
+    label{display:block;margin-top:1rem;text-align:left;color:#444}
+    input,button{width:100%;font-size:1rem;padding:.8rem;border:1px solid #ddd;border-radius:8px;
+                 margin-top:.5rem;margin-bottom:1.2rem}
     input[type=number]{width:45%;display:inline-block;margin-right:10%}
     button{background:#4caf50;color:#fff;border:none;cursor:pointer;transition:.3s}
     button:hover:enabled{background:#45a049}button:disabled{background:#ddd}
     .divider{margin-top:2rem;border-top:1px solid #ddd;padding-top:1rem}
-    .output{font-weight:bold;font-size:1.1rem;margin-top:.8rem}
+    .output{font-weight:bold;font-size:1.05rem;margin-top:.7rem}
     /* modal */
     #storedDataModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
-                     justify-content:center;align-items:center}
-    #storedDataContent{background:#fff;padding:1rem;border-radius:8px;max-width:400px;
-                       width:90%;max-height:80vh;overflow-y:auto;position:relative}
+                     justify-content:center;align-items:center;z-index:1000}
+    #storedDataContent{background:#fff;padding:1rem;border-radius:8px;width:90%;max-width:400px;
+                       max-height:80vh;overflow-y:auto;position:relative}
     #closeModalBtn{position:absolute;top:10px;right:10px;background:#ff6b6b;color:#fff;
                    border:none;border-radius:8px;padding:4px 10px;cursor:pointer}
     .stored-entry{border:1px solid #ccc;border-radius:8px;padding:.8rem;margin:1rem 0;text-align:left}
   </style>
+
+  <!-- main logic -->
+  <script src="app.js" defer></script>
 </head>
 <body>
 
@@ -46,28 +49,36 @@
 
     <h1>Wombat Mange Control – Data Collection</h1>
 
-    <form id="dataCollectionForm">
-      <label for="contractorName">Contractor Name:</label>
-      <input id="contractorName" name="contractorName" type="text" required>
+    <form id="dataForm">
+      <!-- contractor + location -->
+      <label>Contractor Name:
+        <input id="contractorName" name="contractorName" type="text" required>
+      </label>
 
-      <label for="location">Location:</label>
-      <input id="location" name="location" type="text" required>
+      <label>Location:
+        <input id="location" name="location" type="text" required>
+      </label>
 
-      <label for="startDateTime">Start Date/Time:</label>
-      <input id="startDateTime" name="startDateTime" type="datetime-local" readonly required>
+      <!-- times -->
+      <label>Start Date/Time:
+        <input id="startDateTime" name="startDateTime" type="datetime-local" readonly required>
+      </label>
+      <label>Finish Date/Time:
+        <input id="endDateTime" name="endDateTime" type="datetime-local" readonly required>
+      </label>
 
-      <label for="endDateTime">Finish Date/Time:</label>
-      <input id="endDateTime" name="endDateTime" type="datetime-local" readonly required>
+      <!-- burrows -->
+      <label>New Burrows Set:
+        <input id="newBurrows" name="newBurrows" type="number" min="0" step="1" required>
+      </label>
+      <label>Burrows Checked:
+        <input id="checkedBurrows" name="checkedBurrows" type="number" min="0" step="1" required>
+      </label>
+      <label>Burrows Used:
+        <input id="usedBurrows" name="usedBurrows" type="number" min="0" step="1" required>
+      </label>
 
-      <label for="newBurrows">New Burrows Set:</label>
-      <input id="newBurrows" name="newBurrows" type="number" min="0" step="1" required>
-
-      <label for="checkedBurrows">Burrows Checked:</label>
-      <input id="checkedBurrows" name="checkedBurrows" type="number" min="0" step="1" required>
-
-      <label for="usedBurrows">Burrows Used:</label>
-      <input id="usedBurrows" name="usedBurrows" type="number" min="0" step="1" required>
-
+      <!-- timer controls -->
       <div class="divider">
         <button id="startBtn"  type="button">Start</button>
         <button id="pauseBtn"  type="button" disabled>Pause</button>
@@ -93,63 +104,5 @@
       <div id="storedDataList"></div>
     </div>
   </div>
-
-  <script>
-    /* -------- timer + localStorage logic -------- */
-    const S='wombatData',E=t=>String(t).padStart(2,'0'),
-          fmt=ms=>{let s=Math.floor(ms/1000),h=E(Math.floor(s/3600));s%=3600;
-                   return\`\${h}:\${E(Math.floor(s/60))}:\${E(s%60)}\`;};
-    let wStart=null,bStart=null,wMs=0,bMs=0,int=null;
-    const $=id=>document.getElementById(id),
-          upd=()=>{$('elapsedTime').textContent=fmt(wMs);
-                   $('breakTime').textContent=fmt(bMs);};
-
-    $('startBtn').onclick=()=>{const n=new Date().toISOString().slice(0,16);
-      $('startDateTime').value=n;$('endDateTime').value=n;wMs=bMs=0;wStart=Date.now();upd();
-      $('startBtn').disabled=true;$('pauseBtn').disabled=false;$('resumeBtn').disabled=true;$('finishBtn').disabled=false;
-      int=setInterval(()=>{if(wStart){const now=Date.now();wMs+=now-wStart;wStart=now;upd();}},1000);};
-
-    $('pauseBtn').onclick=()=>{bStart=Date.now();clearInterval(int);
-      $('pauseBtn').disabled=true;$('resumeBtn').disabled=false;};
-
-    $('resumeBtn').onclick=()=>{if(bStart){bMs+=Date.now()-bStart;bStart=null;}
-      wStart=Date.now();int=setInterval(()=>{const now=Date.now();wMs+=now-wStart;wStart=now;upd();},1000);
-      $('pauseBtn').disabled=false;$('resumeBtn').disabled=true;};
-
-    $('finishBtn').onclick=()=>{clearInterval(int);
-      if(bStart){bMs+=Date.now()-bStart;bStart=null;}
-      if(wStart){wMs+=Date.now()-wStart;wStart=null;}
-      $('endDateTime').value=new Date().toISOString().slice(0,16);upd();
-      $('startBtn').disabled=false;$('pauseBtn').disabled=$('resumeBtn').disabled=$('finishBtn').disabled=true;};
-
-    $('dataCollectionForm').onsubmit=e=>{
-      e.preventDefault();const f=new FormData(e.target),r={};
-      ['contractorName','location','startDateTime','endDateTime',
-       'newBurrows','checkedBurrows','usedBurrows'].forEach(k=>r[k]=f.get(k));
-      r.totalWork=fmt(wMs);r.totalBreak=fmt(bMs);r.timestamp=new Date().toString();
-      const a=JSON.parse(localStorage.getItem(S)||'[]');a.push(r);
-      localStorage.setItem(S,JSON.stringify(a));
-      e.target.reset();wMs=bMs=0;upd();$('startBtn').disabled=false;$('pauseBtn').disabled=$('resumeBtn').disabled=$('finishBtn').disabled=true;
-      alert('Saved locally (offline).');};
-
-    $('viewDataBtn').onclick=()=>{const d=JSON.parse(localStorage.getItem(S)||'[]'),
-      list=$('storedDataList');list.innerHTML='';
-      if(!d.length){list.innerHTML='<p>No submissions.</p>'; }
-      else d.forEach((it,i)=>{const div=document.createElement('div');div.className='stored-entry';
-        div.innerHTML=`<p><strong>#${i+1}</strong> (${it.timestamp})</p>
-        <p><strong>Contractor:</strong> ${it.contractorName}</p>
-        <p><strong>Location:</strong> ${it.location}</p>
-        <p><strong>Start:</strong> ${it.startDateTime}</p>
-        <p><strong>Finish:</strong> ${it.endDateTime}</p>
-        <p>New: ${it.newBurrows} | Checked: ${it.checkedBurrows} | Used: ${it.usedBurrows}</p>
-        <p>Work: ${it.totalWork} | Break: ${it.totalBreak}</p>`;list.appendChild(div);});
-      $('storedDataModal').style.display='flex';};
-    $('closeModalBtn').onclick=()=>$('storedDataModal').style.display='none';
-    $('storedDataModal').onclick=e=>{if(e.target.id==='storedDataModal')e.target.style.display='none';};
-
-    /* -------- service-worker registration -------- */
-    if('serviceWorker' in navigator)
-      navigator.serviceWorker.register('service-worker.js').catch(console.error);
-  </script>
 </body>
 </html>
