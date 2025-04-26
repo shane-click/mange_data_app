@@ -1,48 +1,33 @@
-// service-worker.js
+/* service-worker.js  –  caches every asset needed for offline use */
+const CACHE = 'mange-cache-v1';
 
-const CACHE_NAME = 'wombat-cache-v1';
-const ASSETS_TO_CACHE = [
-  './',              // this might cache index.html depending on your server
-  './index.html',
-  './manifest.json',
-  './service-worker.js',
-  // Add any external scripts or CSS you have, for example:
-  // './styles.css',
-  // './app.js',
-  // './icons/icon-192.png',
-  // './icons/icon-512.png',
+const ASSETS = [
+  '/mange_data_app/',                       // root → index.html
+  '/mange_data_app/index.html',
+  '/mange_data_app/manifest.json',
+  '/mange_data_app/service-worker.js',
+  '/mange_data_app/icons/icon-192.png',
+  '/mange_data_app/icons/icon-512.png'
+  // add other files here if you create extra CSS/JS/images
 ];
 
-// Install event: Cache files
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
 });
 
-// Activate event: Cleanup old caches if needed
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => k !== CACHE && caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-// Fetch event: Serve from cache if offline
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // Return cached response if found, else fetch from network
-      return cachedResponse || fetch(event.request);
-    })
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });
