@@ -1,20 +1,13 @@
 {
   "name": "Wombat Mange Control",
   "short_name": "Wombat",
-  "start_url": "./index.html",
+  "start_url": "/mange_data_app/index.html",
+  "scope": "/mange_data_app/",
   "display": "standalone",
   "background_color": "#d3d3d3",
   "theme_color": "#ffffff",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
