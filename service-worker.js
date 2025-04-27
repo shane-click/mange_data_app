@@ -1,14 +1,14 @@
-/* service-worker.js  –  caches every asset needed for offline use */
-const CACHE = 'mange-cache-v1';
+/* service-worker.js – caches every file for full offline use */
+const CACHE = 'mange-cache-v2';
 
 const ASSETS = [
-  '/mange_data_app/',                       // root → index.html
+  '/mange_data_app/',
   '/mange_data_app/index.html',
+  '/mange_data_app/app.js',
   '/mange_data_app/manifest.json',
   '/mange_data_app/service-worker.js',
   '/mange_data_app/icons/icon-192.png',
   '/mange_data_app/icons/icon-512.png'
-  // add other files here if you create extra CSS/JS/images
 ];
 
 self.addEventListener('install', e => {
@@ -19,7 +19,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => k !== CACHE && caches.delete(k)))
+      Promise.all(keys.map(k => k!==CACHE && caches.delete(k)))
     )
   );
   self.clients.claim();
