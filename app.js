@@ -19,8 +19,7 @@
 
   // Initialize with current time if fields are empty
   const initializeDateTime = () => {
-    const now = new Date();
-    const nowIso = now.toISOString().slice(0,16);
+    const nowIso = getLocalDateTimeString();
     
     if (!$('startDateTime').value) {
       $('startDateTime').value = nowIso;
@@ -44,10 +43,21 @@
   $('startDateTime').addEventListener('change', validateDateTimeRange);
   $('endDateTime').addEventListener('change', validateDateTimeRange);
 
+  // Helper function to get local datetime string
+  const getLocalDateTimeString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   /* --- buttons ------------------------------------------------------- */
   $('startBtn').onclick = () => {
     // Set current time if fields are empty or update start time to now
-    const nowIso = new Date().toISOString().slice(0,16);
+    const nowIso = getLocalDateTimeString();
     if (!$('startDateTime').value) {
       $('startDateTime').value = nowIso;
     }
@@ -64,18 +74,18 @@
     $('resumeBtn').disabled = true; 
     $('finishBtn').disabled = false;
 
-    tick = setInterval(() => {
-      const now = Date.now(); 
-      wMs += now - wStart; 
-      wStart = now; 
-      update();
-      
-      // Auto-update end time while timer is running (user can still edit manually)
-      const currentTime = new Date().toISOString().slice(0,16);
-      if (isTimerActive) {
-        $('endDateTime').value = currentTime;
-      }
-    }, 1000);
+          tick = setInterval(() => {
+        const now = Date.now(); 
+        wMs += now - wStart; 
+        wStart = now; 
+        update();
+        
+        // Auto-update end time while timer is running (user can still edit manually)
+        const currentTime = getLocalDateTimeString();
+        if (isTimerActive) {
+          $('endDateTime').value = currentTime;
+        }
+      }, 1000);
   };
 
   $('pauseBtn').onclick = () => {
@@ -100,11 +110,11 @@
       wStart = now; 
       update();
       
-      // Auto-update end time while timer is running
-      const currentTime = new Date().toISOString().slice(0,16);
-      if (isTimerActive) {
-        $('endDateTime').value = currentTime;
-      }
+              // Auto-update end time while timer is running
+        const currentTime = getLocalDateTimeString();
+        if (isTimerActive) {
+          $('endDateTime').value = currentTime;
+        }
     }, 1000);
     
     $('pauseBtn').disabled = false; 
@@ -125,7 +135,7 @@
     }
     
     // Set final end time to current time (user can still edit if needed)
-    $('endDateTime').value = new Date().toISOString().slice(0,16); 
+    $('endDateTime').value = getLocalDateTimeString(); 
     update();
 
     $('startBtn').disabled = false;
