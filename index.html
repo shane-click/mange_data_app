@@ -10,31 +10,555 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
-  <!-- basic styling -->
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- modern styling -->
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:sans-serif;background:#d3d3d3;display:flex;justify-content:center;
-         align-items:center;min-height:100vh}
-    .container{background:#fff;padding:2rem;border-radius:12px;width:100%;max-width:500px;
-               box-shadow:0 4px 10px rgba(0,0,0,.1);text-align:center}
-    .logo-container img{max-width:150px;margin-bottom:1.5rem}
-    h1{font-size:1.5rem;margin-bottom:1.5rem}
-    label{display:block;margin-top:1rem;text-align:left;color:#444}
-    input,button{width:100%;font-size:1rem;padding:.8rem;border:1px solid #ddd;border-radius:8px;
-                 margin-top:.5rem;margin-bottom:1.2rem}
-    input[type=number]{width:45%;display:inline-block;margin-right:10%}
-    button{background:#4caf50;color:#fff;border:none;cursor:pointer;transition:.3s}
-    button:hover:enabled{background:#45a049}button:disabled{background:#ddd}
-    .divider{margin-top:2rem;border-top:1px solid #ddd;padding-top:1rem}
-    .output{font-weight:bold;font-size:1.05rem;margin-top:.7rem}
-    /* modal */
-    #storedDataModal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
-                     justify-content:center;align-items:center;z-index:1000}
-    #storedDataContent{background:#fff;padding:1rem;border-radius:8px;width:90%;max-width:400px;
-                       max-height:80vh;overflow-y:auto;position:relative}
-    #closeModalBtn{position:absolute;top:10px;right:10px;background:#ff6b6b;color:#fff;
-                   border:none;border-radius:8px;padding:4px 10px;cursor:pointer}
-    .stored-entry{border:1px solid #ccc;border-radius:8px;padding:.8rem;margin:1rem 0;text-align:left}
+    :root {
+      --primary: #0ea5e9;
+      --primary-dark: #0284c7;
+      --primary-light: #38bdf8;
+      --secondary: #06b6d4;
+      --secondary-dark: #0891b2;
+      --accent: #22d3ee;
+      --success: #10b981;
+      --success-dark: #059669;
+      --warning: #f59e0b;
+      --warning-dark: #d97706;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      color: var(--gray-700);
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: white;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      position: relative;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 8s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 1rem;
+    }
+
+    .logo-container img {
+      max-width: 200px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      border: 3px solid rgba(255,255,255,0.2);
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      letter-spacing: -0.025em;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-container {
+      padding: 2rem;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .form-triple {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    label i {
+      margin-right: 0.5rem;
+      color: var(--primary);
+      width: 16px;
+      flex-shrink: 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: var(--gray-50);
+      font-family: inherit;
+      min-width: 0;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+      background: white;
+    }
+
+    input:hover:not(:focus) {
+      border-color: var(--gray-300);
+    }
+
+    input[type="datetime-local"] {
+      position: relative;
+    }
+
+    .datetime-group {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .section {
+      background: var(--gray-50);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border: 1px solid var(--gray-200);
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 0.5rem;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .timer-controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+    }
+
+    button {
+      padding: 0.875rem 1rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      font-family: inherit;
+      box-shadow: var(--shadow-sm);
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:not(:disabled):active {
+      transform: translateY(0);
+    }
+
+    .btn-start {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-start:hover:not(:disabled) {
+      background: var(--success-dark);
+    }
+
+    .btn-pause {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-pause:hover:not(:disabled) {
+      background: var(--warning-dark);
+    }
+
+    .btn-resume {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-resume:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    .btn-finish {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-finish:hover:not(:disabled) {
+      background: var(--danger-dark);
+    }
+
+    .btn-reset {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-reset:hover:not(:disabled) {
+      background: var(--warning-dark);
+    }
+
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    .btn-view {
+      background: var(--secondary);
+      color: white;
+      width: 100%;
+      margin-top: 0.75rem;
+    }
+
+    .btn-view:hover:not(:disabled) {
+      background: var(--secondary-dark);
+    }
+
+    .timer-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .timer-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+      min-width: 0;
+    }
+
+    .timer-card .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .timer-card .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Modal styles */
+    #storedDataModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    #storedDataContent {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--gray-200);
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 20px 20px 0 0;
+      position: relative;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #closeModalBtn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    #closeModalBtn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .stored-entry {
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--gray-50);
+      transition: all 0.2s ease;
+    }
+
+    .stored-entry:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stored-entry p {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .stored-entry p:last-child {
+      margin-bottom: 0;
+    }
+
+    .stored-entry strong {
+      color: var(--gray-800);
+      font-weight: 700;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        border-radius: 16px;
+        margin: 0.5rem;
+        max-width: calc(100vw - 1rem);
+      }
+
+      .form-row,
+      .form-triple {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .timer-controls {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      .timer-display {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .header {
+        padding: 1.5rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      .section {
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+
+      button {
+        padding: 1rem;
+        font-size: 0.8rem;
+      }
+
+      .timer-card .value {
+        font-size: 1.25rem;
+      }
+
+      #storedDataContent {
+        max-width: calc(100vw - 2rem);
+        margin: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      .container {
+        border-radius: 12px;
+        max-width: calc(100vw - 1rem);
+      }
+
+      .header {
+        padding: 1rem;
+      }
+
+      .form-container {
+        padding: 1rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-triple {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 
   <!-- main logic -->
@@ -43,65 +567,126 @@
 <body>
 
   <div class="container">
-    <div class="logo-container">
-      <img src="icons/icon-192.png" alt="Logo">
+    <div class="header">
+      <div class="logo-container">
+        <img src="icons/icon-192.png" alt="Logo">
+      </div>
+      <h1>Wombat Mange Control</h1>
+      <p>Data Collection System</p>
     </div>
 
-    <h1>Wombat Mange Control – Data Collection</h1>
+    <div class="form-container">
+      <form id="dataForm">
+        <div class="form-grid">
+          <!-- Contractor and Location -->
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-user"></i>Contractor Name</label>
+              <input id="contractorName" name="contractorName" type="text" required placeholder="Enter contractor name">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-map-marker-alt"></i>Location</label>
+              <input id="location" name="location" type="text" required placeholder="Enter location">
+            </div>
+          </div>
 
-    <form id="dataForm">
-      <!-- contractor + location -->
-      <label>Contractor Name:
-        <input id="contractorName" name="contractorName" type="text" required>
-      </label>
+          <!-- Date/Time Section -->
+          <div class="section">
+            <div class="section-title">
+              <i class="fas fa-clock"></i>
+              Time Tracking
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-play"></i>Start Date/Time</label>
+                <div class="datetime-group">
+                  <input id="startDateTime" name="startDateTime" type="datetime-local" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-stop"></i>Finish Date/Time</label>
+                <div class="datetime-group">
+                  <input id="endDateTime" name="endDateTime" type="datetime-local" required>
+                </div>
+              </div>
+            </div>
 
-      <label>Location:
-        <input id="location" name="location" type="text" required>
-      </label>
+            <!-- Timer Controls -->
+            <div class="timer-controls">
+              <button id="startBtn" type="button" class="btn-start">
+                <i class="fas fa-play"></i>Start
+              </button>
+              <button id="pauseBtn" type="button" class="btn-pause" disabled>
+                <i class="fas fa-pause"></i>Pause
+              </button>
+              <button id="resumeBtn" type="button" class="btn-resume" disabled>
+                <i class="fas fa-play"></i>Resume
+              </button>
+              <button id="finishBtn" type="button" class="btn-finish" disabled>
+                <i class="fas fa-stop"></i>Finish
+              </button>
+              <button id="resetBtn" type="button" class="btn-reset">
+                <i class="fas fa-refresh"></i>Reset
+              </button>
+            </div>
 
-      <!-- times -->
-      <label>Start Date/Time:
-        <input id="startDateTime" name="startDateTime" type="datetime-local" readonly required>
-      </label>
-      <label>Finish Date/Time:
-        <input id="endDateTime" name="endDateTime" type="datetime-local" readonly required>
-      </label>
+            <!-- Timer Display -->
+            <div class="timer-display">
+              <div class="timer-card">
+                <div class="label">Elapsed Time</div>
+                <div class="value" id="elapsedTime">00:00:00</div>
+              </div>
+              <div class="timer-card">
+                <div class="label">Break Time</div>
+                <div class="value" id="breakTime">00:00:00</div>
+              </div>
+            </div>
+          </div>
 
-      <!-- burrows -->
-      <label>New Burrows Set:
-        <input id="newBurrows" name="newBurrows" type="number" min="0" step="1" required>
-      </label>
-      <label>Burrows Checked:
-        <input id="checkedBurrows" name="checkedBurrows" type="number" min="0" step="1" required>
-      </label>
-      <label>Burrows Used:
-        <input id="usedBurrows" name="usedBurrows" type="number" min="0" step="1" required>
-      </label>
+          <!-- Burrows Section -->
+          <div class="section">
+            <div class="section-title">
+              <i class="fas fa-home"></i>
+              Burrow Data
+            </div>
+            <div class="form-triple">
+              <div class="form-group">
+                <label><i class="fas fa-plus"></i>New Burrows Set</label>
+                <input id="newBurrows" name="newBurrows" type="number" min="0" step="1" required placeholder="0">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-search"></i>Burrows Checked</label>
+                <input id="checkedBurrows" name="checkedBurrows" type="number" min="0" step="1" required placeholder="0">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-check"></i>Burrows Used</label>
+                <input id="usedBurrows" name="usedBurrows" type="number" min="0" step="1" required placeholder="0">
+              </div>
+            </div>
+          </div>
 
-      <!-- timer controls -->
-      <div class="divider">
-        <button id="startBtn"  type="button">Start</button>
-        <button id="pauseBtn"  type="button" disabled>Pause</button>
-        <button id="resumeBtn" type="button" disabled>Resume</button>
-        <button id="finishBtn" type="button" disabled>Finish</button>
-
-        <div class="output">Elapsed <span id="elapsedTime">00:00:00</span></div>
-        <div class="output">Breaks  <span id="breakTime">00:00:00</span></div>
-      </div>
-
-      <button type="submit" style="background:#2196f3">Submit</button>
-      <button id="viewDataBtn" type="button" style="background:#9c27b0;margin-top:1rem">
-        View Stored Data
-      </button>
-    </form>
+          <!-- Submit Buttons -->
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-save"></i>Submit Data
+          </button>
+          <button id="viewDataBtn" type="button" class="btn-view">
+            <i class="fas fa-database"></i>View Stored Data
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- modal -->
+  <!-- Modal -->
   <div id="storedDataModal">
     <div id="storedDataContent">
-      <button id="closeModalBtn">Close</button>
-      <h2>Stored Submissions</h2>
-      <div id="storedDataList"></div>
+      <div class="modal-header">
+        <h2><i class="fas fa-database"></i> Stored Submissions</h2>
+        <button id="closeModalBtn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="storedDataList"></div>
+      </div>
     </div>
   </div>
 </body>
